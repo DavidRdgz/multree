@@ -140,6 +140,17 @@ yes.children <- function (t, XY, s, id, ...) {
     t
 }
 
+all.true <- function (Y, ...) {
+    sum(Y)/length(Y) == 1
+}
+
+check.formula <- function (formula, data, ...) {
+    tf <- unlist(lapply(all.vars(formula), function(x) x %in% colnames(data)))
+    if (sum(sum(tf) != length(tf))) {
+        return("Did you write the formula right?")
+    }
+}
+
 tree <- function(X, Y, Pure =Gini, is.forest = FALSE, splitter = MSplit, model = LM, ...) {
     args <- mget(names(formals()),sys.frame(sys.nframe()))[-c(1,2)]
 
@@ -162,7 +173,7 @@ tree <- function(X, Y, Pure =Gini, is.forest = FALSE, splitter = MSplit, model =
             s      <- do.call(splitter, c(XY, args))
             subset <- s[["candidates"]]
 
-            if (is.null(subset)) {
+            if (is.null(subset) || all.true(subset)) {
                 t        <- no.children(t, XY, s)
             } else {
                 children <- do.call(get.children, c(XY, list(subset = subset)))
@@ -175,4 +186,5 @@ tree <- function(X, Y, Pure =Gini, is.forest = FALSE, splitter = MSplit, model =
     }
     t
 }
+
 

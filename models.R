@@ -28,4 +28,3 @@ LM <- function (Y, X, r, ...) {
     lm(Y.hat ~ ., data = X)
 }
 
-
