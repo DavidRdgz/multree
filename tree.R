@@ -11,6 +11,7 @@ Tree <- function (args = 0) {
 }
 
 get.top.percent <- function (Y, ...) {
+    print(table(Y))
     percent <- sort(table(Y), decreasing = TRUE) / length(Y)
     round(percent[[1]], 2)
 }
@@ -88,7 +89,7 @@ m.predict <- function(t, X, ...) {
         node <- get.branch(t, 1)
 
         while (node$r.id != 0 && node$l.id != 0) {
-            go.right <- predict(node$model,X[iter,]) > node$cutoff
+            go.right <- predRCandidates(node$model,X[iter,], t$call$model)
 
             if (go.right) {
                 node <- get.branch(t, node$r.id)
@@ -154,7 +155,6 @@ tree <- function(X, Y, Pure =Gini, is.forest = FALSE, splitter = MSplit, model =
     while(length(q) > 0) {
         XY <- q[[1]]; q <- q[-1]
 
-        print(XY[["X"]])
         if (is.pure(XY[["Y"]]) || length(XY[["Y"]]) <= 2) {
             n <- do.call(Node, XY)
             t <- grow.tree(t, n)
