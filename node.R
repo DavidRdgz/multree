@@ -51,12 +51,15 @@ swap <- function (i, r) {
 }
 
 predRCandidates <- function (n, X, model) {
-    if (identical(model, LDA)) {
-        preds <- c(predict(n, X)[[3]])
+    if (identical(model, LDA)  ) {
+        Rcandidates <- c(predict(n, X)[["class"]])
+    } else if (identical(model, SVM)) {
+        Rcandidates <- as.logical(as.vector(predict(n,X)))
     } else {
         preds <- c(predict(n, X))
+        Rcandidates <- preds > 0
     }
-    Rcandidates <- preds > 0
+    return(Rcandidates)
 }
 
 load.it <- function (n, Rcandidates, g, r, ...) {
@@ -88,7 +91,17 @@ get.max <- function (i.delta, ...) {
 }
 
 maxi <- function (Y, X, model, r, ...) {
-    c        <- unique(Y)
+    c <- unique(Y)
+    print(c)
+
+    if (length(setdiff(c,r)) == 0 ) {
+        return(load.it(model, Y[Y %in% r], model, r))
+    } else if (length(setdiff(c,r)) == 1) {
+        a <- setdiff(c,r)
+        c <- as.factor(setdiff(c,a))
+    }
+
+    print(c)
     i.delta  <- lapply(c, function(x) load.swap(droplevels(x), Y, X, model, r))
 
     get.max(i.delta)
