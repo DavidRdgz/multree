@@ -2,6 +2,13 @@
 Is a multivariate decision tree classifier. This classifier constructs a decision tree where
 the splitting hypersurface are not necessarily orthogonal hyperplanes. 
 
+You might alternatively these trees:
+
+- Support vector trees
+- Neural Trees
+- GLM trees
+
+
 # Usage
 
 Below are some quick steps to get this package loaded.
