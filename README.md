@@ -6,7 +6,7 @@ the splitting hypersurface are not necessarily orthogonal hyperplanes.
 
 Below are some quick steps to get this package loaded.
 
-*Install*
+**Install**
 
 Just install the package using the `devtools` package in `R`.
 
@@ -14,7 +14,7 @@ Just install the package using the `devtools` package in `R`.
 devtools::install_github("davidrdgz/multree")
 ```
 
-*Training*
+**Training**
 
 Then you can go ahead and run a quick test on the iris data set as follows,
 
@@ -28,7 +28,7 @@ That should fit out multivariate decision tree. In this case we have constructed
 a supprt vector tree. 
 
 
-*Testing*
+**Testing**
 
 Now we can make some silly predictions (silly because we fit the tree with this data),
 
@@ -46,7 +46,7 @@ pred         setosa versicolor virginica
 So we see that our support vector tree classifies. 
 
 
-*Plotting*
+**Plotting**
 
 Further, we can take a look at our tree,
 
