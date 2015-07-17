@@ -63,6 +63,8 @@ force.graph(dt)
 
 ![alt text](images/svmtree.gif)
 
+The noticeable difference here, compared to CART or ID3 decision trees, is the size. Here the decision tree is small and of a depth comparable to the number of classes we began with.
+
 # Why
 A multivariate decision tree classifier addresses the problems traditionally encountered with decision trees. Some issues that
 arise with traditional decision trees are
