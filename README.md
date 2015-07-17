@@ -18,12 +18,14 @@ X  <- iris[,1:4]
 dt <- multree(X, Y, model = SVM)
 ```
 
-That should fit out multivariate decision tree. Now we can make some silly predictions (silly because we fit the tree with this data),
+That should fit out multivariate decision tree. In this case we have constructed
+a supprt vector tree. Now we can make some silly predictions (silly because we fit the tree with this data),
 
 ```
 > p  <- m.predict(dt, X)
 > table(pred = p, actu = Y)
 
+            actu
 pred         setosa versicolor virginica
   setosa         50          0         0
   versicolor      0         48         1
