@@ -1,0 +1,10 @@
+Package: multree
+Type: Package
+Title: Multivariate-Tree
+Version: 0.1
+Date: 2015-07-16
+Author: David Rodriguez
+Maintainer: David Rodriguez <davidqed@gmail.com>
+Description: A multivariate decision tree. A given node is split based on one or more combinations of the attributes. These combination are provided by either a generalized linear model, support vector machine, neural network, or linear discriminate analysis.
+License: What license is it under?
+LazyData: TRUE
