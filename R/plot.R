@@ -17,7 +17,7 @@ graph <- function (dt, ...) {
     Source <- c()
     Target <- c()
     for (node in dt$tree) {
-        if (!is.leaf(node)) {
+        if (!is.a.leaf(node)) {
             Source <- c(Source, rep(node$id, 2))
             Target <- c(Target, get.children.id(node))
         }
