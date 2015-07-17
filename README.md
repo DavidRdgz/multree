@@ -46,8 +46,15 @@ So we see that our support vector tree classifies.
 
 ### Plotting
 
+
 Further, we can take a look at our tree,
 
+
+```
+force.graph(dt)
+```
+
+![alt text](images/svmtree.gif)
 
 # Why
 A multivariate decision tree classifier addresses the problems traditionally encountered with decision trees. Some issues that
