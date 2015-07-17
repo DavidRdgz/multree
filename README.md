@@ -4,6 +4,7 @@ the splitting hypersurface are not necessarily orthogonal hyperplanes.
 
 # Usage
 
+## Install
 Just install the package using the `devtools` package in `R`.
 
 ```
