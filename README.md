@@ -2,7 +2,7 @@
 Is a multivariate decision tree classifier. This classifier constructs a decision tree where
 the splitting hypersurface are not necessarily orthogonal hyperplanes. 
 
-You might alternatively these trees:
+You might alternatively call these trees:
 
 - Support vector trees
 - Neural Trees
