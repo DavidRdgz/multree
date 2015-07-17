@@ -52,7 +52,7 @@ simple.graph <- function (dt, ...) {
 #' force.graph(dt)
 
 force.graph <- function (dt, ...) {
-    forceNetwork(Links = graph.value(dt), Nodes = get.labels(dt),
+    networdD3::forceNetwork(Links = graph.value(dt), Nodes = get.labels(dt),
                 Source = "Source", Target = "Target", Value = "value",
                 NodeID = "names", Group = "group", opacity = .8,
                 legend = TRUE, zoom = TRUE, fontSize = 10)
