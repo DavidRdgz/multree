@@ -1,5 +1,6 @@
 source("R/node.R")
 
+
 MulTree <- function (args = 0) {
     data <- list(
                  tree = list(),
@@ -182,7 +183,6 @@ all.true <- function (Y, ...) {
 #' Y  <- iris[,5]
 #' X  <- iris[,1:4]
 #' dt <- multree(X, Y, model = SVM)
-
 
 multree <- function(X, Y, Pure =Gini, is.forest = FALSE, splitter = MSplit, model = LM, ...) {
     args <- mget(names(formals()),sys.frame(sys.nframe()))[-c(1,2)]

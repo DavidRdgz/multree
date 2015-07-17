@@ -1,6 +1,7 @@
 source("R/purity.R")
 source("R/models.R")
 
+
 Node <- function (id, X, Y, label, model = 0, r = 0, percent= 0,  cutoff= 0, l.id = 0, r.id = 0, candidates = 0, gain = 0) {
     data <- list(
                  id         = id,
@@ -51,7 +52,7 @@ swap <- function (i, r) {
 }
 
 predRCandidates <- function (n, X, model) {
-    if (identical(model, LDA)  ) {
+    if (identical(model, LDA)) {
         Rcandidates <- c(predict(n, X)[["class"]])
     } else if (identical(model, SVM)) {
         Rcandidates <- as.logical(as.vector(predict(n,X)))
