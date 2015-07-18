@@ -1,12 +1,13 @@
 # multree
 Is a multivariate decision tree classifier. This classifier constructs a decision tree where
-the splitting hypersurface are not necessarily orthogonal hyperplanes. 
+the splitting hypersurfaces are not necessarily orthogonal hyperplanes. 
 
 You might alternatively call these trees:
 
 - Support vector trees
 - Neural Trees
-- GLM trees
+
+etc.
 
 
 # Usage
@@ -29,8 +30,7 @@ X  <- iris[,1:4]
 dt <- multree(X, Y, model = SVM)
 ```
 
-That should fit out multivariate decision tree. In this case we have constructed
-a supprt vector tree. 
+In this case we have constructed a supprt vector tree. 
 
 
 ### Testing
@@ -48,7 +48,7 @@ pred         setosa versicolor virginica
   virginica       0          2        49
 ```
 
-So we see that our support vector tree classifies. 
+So we see that our support vector tree classifies. An interesting note is to compare this performance with a traditional suppport vector machine.
 
 
 ### Plotting
@@ -63,9 +63,10 @@ force.graph(dt)
 
 ![alt text](images/svmtree.gif)
 
-The noticeable difference here, compared to CART or ID3 decision trees, is the size. Here the decision tree is small and of a depth comparable to the number of classes we began with.
+The noticeable difference here, compared to CART or ID3 decision trees, is the size. Alternatively, check the `unitree` github page. Here the decision tree is small and of a depth comparable to the number of classes we began with.
 
 # Why
+
 A multivariate decision tree classifier addresses the problems traditionally encountered with decision trees. Some issues that
 arise with traditional decision trees are
 
