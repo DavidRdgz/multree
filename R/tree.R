@@ -142,8 +142,8 @@ push.children <- function (q, n.id, children, ...) {
     q
 }
 
-is.pure <- function (Y, ...) {
-    n <- table(Y)/length(Y) > .70
+is.pure <- function (Y, a, ...) {
+    n <- table(Y)/length(Y) > a
     sum(n) > 0
 }
 
@@ -172,6 +172,7 @@ all.true <- function (Y, ...) {
 #' @param Y a vector of classes set as factors.
 #' @param Pure may be: gini, information, twoing. Sets impurity measure for a node.
 #' @param model may be: GLM, SVM, NET, LM, LDA. Sets the hyper surface spliter at nodes in the tree.
+#' @param a may be: any real value. Cuts-off the purity of the predicted class.
 #'
 #' @return an MulTree object with a tree consisting of nodes and their attributes.
 #' @author David Rodriguez
@@ -184,7 +185,7 @@ all.true <- function (Y, ...) {
 #' X  <- iris[,1:4]
 #' dt <- multree(X, Y, model = SVM)
 
-multree <- function(X, Y, Pure =Gini, is.forest = FALSE, splitter = MSplit, model = LM, ...) {
+multree <- function(X, Y, Pure =Gini, is.forest = FALSE, splitter = MSplit, model = LM, a =.75, ...) {
     args <- mget(names(formals()),sys.frame(sys.nframe()))[-c(1,2)]
 
     if (isTRUE(is.forest)) {
@@ -199,7 +200,7 @@ multree <- function(X, Y, Pure =Gini, is.forest = FALSE, splitter = MSplit, mode
     while(length(q) > 0) {
         XY <- q[[1]]; q <- q[-1]
 
-        if (is.pure(XY[["Y"]]) || length(XY[["Y"]]) <= 2) {
+        if (is.pure(XY[["Y"]], a) || length(XY[["Y"]]) <= 2) {
             n <- do.call(Node, XY)
             t <- grow.tree(t, n)
         } else {

@@ -5,7 +5,7 @@
 \title{Building a multivariate decision tree}
 \usage{
 multree(X, Y, Pure = Gini, is.forest = FALSE, splitter = MSplit,
-  model = LM, ...)
+  model = LM, a = 0.75, ...)
 }
 \arguments{
 \item{X}{a dataframe of continuous or categorical values.}
@@ -15,6 +15,8 @@ multree(X, Y, Pure = Gini, is.forest = FALSE, splitter = MSplit,
 \item{Pure}{may be: gini, information, twoing. Sets impurity measure for a node.}
 
 \item{model}{may be: GLM, SVM, NET, LM, LDA. Sets the hyper surface spliter at nodes in the tree.}
+
+\item{a}{may be: any real value. Cuts-off the purity of the predicted class.}
 }
 \value{
 an MulTree object with a tree consisting of nodes and their attributes.
