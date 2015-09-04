@@ -4,7 +4,7 @@ require(e1071)
 
 NET <- function (Y, X, r, ...) {
     Y.hat <- unlist(lapply(Y, function(x) x %in% r))
-    nnet(Y.hat ~ ., data = X, size = 2, trace = FALSE)
+    nnet(Y.hat ~ ., data = X, size = 15, trace = FALSE)
 }
 
 GLM <- function (Y, X, r, ...) {

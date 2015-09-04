@@ -1,7 +1,12 @@
 source("R/tree.R")
 require(networkD3)
 
-
+lookup <- function(labels, unique.labels) {
+  for (iter in 1:length(unique.labels)) {
+      labels[labels == unique.labels[iter]] <- iter
+      }
+  as.numeric(labels)
+}
 
 get.children.id <- function (node, ...) {
     c(node$l.id, node$r.id)
@@ -9,10 +14,14 @@ get.children.id <- function (node, ...) {
 
 get.labels <- function (dt, ...) {
     names<- c()
+    labs <- c()
     for (node in dt$tree) {
-        names <- c(names, paste(node$id, "-", node$label,"-",node$percent))
+        names <- c(names, paste(node$id, "-", sort(paste(node$r, collapse="-")),"-",node$percent))
+        labs <- c(labs, sort(paste(node$r, collapse="-")))
     }
-    data.frame(names, group = 1:length(names), size = rep(1,length(names)))
+    candidates <- unique(labs)
+    #data.frame(names, group = lookup(labs, candidates), size = rep(1,length(names)))
+    data.frame(names, group = labs, size = rep(1,length(names)))
 }
 
 graph <- function (dt, ...) {
@@ -56,6 +65,7 @@ simple.graph <- function (dt, ...) {
 force.graph <- function (dt, ...) {
     networkD3::forceNetwork(Links = graph.value(dt), Nodes = get.labels(dt),
                 Source = "Source", Target = "Target", Value = "value",
-                NodeID = "names", Group = "group", opacity = .8,
-                legend = TRUE, zoom = TRUE, fontSize = 10)
+                NodeID = "names", Group = "group", opacity = .9,
+                legend = TRUE, zoom = TRUE, fontSize = 10,
+                opacityNoHover = 1)
 }

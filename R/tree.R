@@ -105,8 +105,11 @@ get.parent <- function (t, id) {
 
 m.predict <- function(t, X, ...) {
     predictions <- c()
-    for (iter in seq_along(1:nrow(X))) {
-        node <- get.branch(t, 1)
+    cnt <- nrow(X)
+    pb <- txtProgressBar(min = 0, max = cnt, style = 3)
+    for (iter in seq_along(1:cnt)) {
+      setTxtProgressBar(pb, iter)
+      node <- get.branch(t, 1)
 
         while (node$r.id != 0 && node$l.id != 0) {
             go.right <- predRCandidates(node$model,X[iter,], t$call$model)
