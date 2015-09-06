@@ -11,6 +11,7 @@ MulTree <- function (args = 0) {
 }
 
 get.top.percent <- function (Y, ...) {
+    print(Y)
     percent <- sort(table(Y), decreasing = TRUE) / length(Y)
     round(percent[[1]], 2)
 }
@@ -146,6 +147,9 @@ push.children <- function (q, n.id, children, ...) {
 }
 
 is.pure <- function (Y, a, ...) {
+    if ( length(Y) < 2) {
+      return(TRUE)
+    }
     n <- table(Y)/length(Y) > a
     sum(n) > 0
 }
@@ -163,8 +167,13 @@ yes.children <- function (t, XY, s, id, ...) {
     t
 }
 
-all.true <- function (Y, ...) {
-    sum(Y)/length(Y) == 1
+all.true.false <- function (Y, ...) {
+    n <- sum(Y)/length(Y)
+    if (n == 0 || n  ==1) {
+       return(TRUE)
+    } else {
+       return(FALSE)
+    }
 }
 
 #' Building a multivariate decision tree
@@ -203,14 +212,14 @@ multree <- function(X, Y, Pure =Gini, is.forest = FALSE, splitter = MSplit, mode
     while(length(q) > 0) {
         XY <- q[[1]]; q <- q[-1]
 
-        if (is.pure(XY[["Y"]], a) || length(XY[["Y"]]) <= 2) {
+        if (is.pure(XY[["Y"]], a)) {
             n <- do.call(Node, XY)
             t <- grow.tree(t, n)
         } else {
             s      <- do.call(splitter, c(XY, args))
             subset <- s[["candidates"]]
 
-            if (is.null(subset) || all.true(subset)) {
+            if (is.null(subset) || all.true.false(subset)) {
                 t        <- no.children(t, XY, s)
             } else {
                 children <- do.call(get.children, c(XY, list(subset = subset)))
