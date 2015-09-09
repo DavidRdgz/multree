@@ -27,7 +27,7 @@ Then you can go ahead and run a quick test on the iris data set as follows,
 ```
 Y  <- iris[,5]
 X  <- iris[,1:4]
-dt <- multree(X, Y, model = SVM)
+t <- multree(Y,X)
 ```
 
 In this case we have constructed a supprt vector tree. 
@@ -38,7 +38,7 @@ In this case we have constructed a supprt vector tree.
 Now we can make some silly predictions (silly because we fit the tree with this data),
 
 ```
-> p  <- m.predict(dt, X)
+> p  <- m.predict(t, X)
 > table(pred = p, actu = Y)
 
             actu
@@ -58,7 +58,7 @@ Further, we can take a look at our tree,
 
 
 ```
-force.graph(dt)
+force.graph(t)
 ```
 
 ![alt text](images/svmtree.gif)
