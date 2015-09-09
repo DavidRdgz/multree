@@ -4,19 +4,19 @@
 \alias{multree}
 \title{Building a multivariate decision tree}
 \usage{
-multree(X, Y, Pure = Gini, is.forest = FALSE, splitter = MSplit,
-  model = LM, a = 0.75, ...)
+multree(Y, X, model = "svm", a = 0.8, tune = NULL, purity = "gini",
+  is.forest = FALSE, ...)
 }
 \arguments{
-\item{X}{a dataframe of continuous or categorical values.}
+\item{\code{X}}{a dataframe of continuous or categorical values.}
 
-\item{Y}{a vector of classes set as factors.}
+\item{\code{Y}}{a vector of classes set as factors.}
 
-\item{Pure}{may be: gini, information, twoing. Sets impurity measure for a node.}
+\item{\code{purity}}{may be: \code{gini, information, twoing}. Sets impurity measure for a node.}
 
-\item{model}{may be: GLM, SVM, NET, LM, LDA. Sets the hyper surface spliter at nodes in the tree.}
+\item{\code{model}}{may be: \code{glm, svm, net, lm, lda}. Sets the hyper surface spliter at nodes in the tree.}
 
-\item{a}{may be: any real value. Cuts-off the purity of the predicted class.}
+\item{\code{a}}{may be: any real value. Cuts-off tree growth if subset has purity greater than \code{a}.}
 }
 \value{
 an MulTree object with a tree consisting of nodes and their attributes.
@@ -30,7 +30,7 @@ This function develops a multivariate decision tree classifier to predict an uns
 \examples{
 Y  <- iris[,5]
 X  <- iris[,1:4]
-dt <- multree(X, Y, model = SVM)
+dt <- multree(Y, X, "svm")
 }
 \author{
 David Rodriguez

@@ -1,2 +1,4 @@
-exportPattern("^[[:alpha:]]+")
+export("multree")
+export("m.predict")
+export("force.graph")
 

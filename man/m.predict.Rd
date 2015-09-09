@@ -23,7 +23,7 @@ This function provides class predictions from a dataframe 'x' based on a 'multre
 \examples{
 Y  <- iris[,5]
 X  <- iris[,1:4]
-dt <- multree(X, Y, model = SVM)
+dt <- multree(Y, X)
 p  <- m.predict(dt, X)
 table(pred = p, actu = Y)
 }

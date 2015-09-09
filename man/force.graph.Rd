@@ -21,7 +21,7 @@ This function builds a D3 javascript object to view and analyze a \code{multree}
 \examples{
 Y  <- iris[,5]
 X  <- iris[,1:4]
-dt <- multree(X, Y, model = SVM)
+dt <- multree(Y,X)
 force.graph(dt)
 }
 \author{
