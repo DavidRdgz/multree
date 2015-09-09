@@ -1,8 +1,7 @@
 source("R/purity.R")
 source("R/models.R")
 
-
-Node <- function (id, X, Y, label, model = 0, r = 0, percent= 0,  cutoff= 0, l.id = 0, r.id = 0, candidates = 0, gain = 0) {
+Node <- function (id, X, Y, label, model = 0, fit = 0, r = 0, percent= 0,  cutoff= 0, l.id = 0, r.id = 0, candidates = 0, gain = 0) {
     data <- list(
                  id         = id,
                  X          = X,
@@ -14,28 +13,12 @@ Node <- function (id, X, Y, label, model = 0, r = 0, percent= 0,  cutoff= 0, l.i
                  l.id       = l.id,
                  r.id       = r.id,
                  model      = model,
+                 fit        = fit,
                  percent    = percent,
                  cutoff     = cutoff
                 )
     class(data) <- append(class(data), "Node")
     return(data)
-}
-
-get.Gain <- function (Pure, Y, Rcandidates, ...) {
-    IR     <- Pure(Y[Rcandidates])
-    IL     <- Pure(Y[!Rcandidates])
-    p      <- sum(Rcandidates)/length(Y)
-
-    if (identical(Pure, match.fun("Twoing"))) {
-        return(AbsSum(IL, IR, p))
-    } else {
-        return(Gain(Pure(Y), IL, IR, p))
-    }
-}
-
-get.GainRatio <- function (gain, Rcandidates) {
-    p <- sum(Rcandidates)/length(Rcandidates)
-    gain/Potential(p)
 }
 
 swap <- function (i, r) {
@@ -51,33 +34,21 @@ swap <- function (i, r) {
     }
 }
 
-predRCandidates <- function (n, X, model) {
-    if (identical(model, LDA)) {
-        Rcandidates <- c(predict(n, X)[["class"]])
-    } else if (identical(model, SVM)) {
-        Rcandidates <- as.logical(as.vector(predict(n,X)))
-    } else {
-        preds <- c(predict(n, X))
-        Rcandidates <- preds > 0
-    }
-    return(Rcandidates)
+load.it <- function (model, fit, Rcandidates, g, r, ...) {
+    list(model = model, fit = fit, candidates = Rcandidates, gain = g, r = r)
 }
 
-load.it <- function (n, Rcandidates, g, r, ...) {
-    list(model = n, candidates = Rcandidates, gain = g, r = r)
+load.set <- function (Y, X, model, r, purity, ...) {
+    fit         <- model$call(Y, X, r)
+    Rcandidates <- model$predictor(fit, X)
+    i           <- gain(purity, Y, Rcandidates)
+
+    load.it(model, fit, Rcandidates, i, r)
 }
 
-load.set <- function (Y, X, model, r, Pure = Info, ...) {
-    n           <- model(Y, X, r)
-    Rcandidates <- predRCandidates(n, X, model)
-    i           <- get.Gain(Pure, Y, Rcandidates)
-
-    load.it(n, Rcandidates, i, r)
-}
-
-load.swap <- function (c, Y, X, model, r) {
+load.swap <- function (c, Y, X, model, r, purity) {
     r <- swap(c,r)
-    load.set(Y, X, model, r)
+    load.set(Y, X, model, r, purity)
 }
 
 init.split <- function (c, ...) {
@@ -91,40 +62,40 @@ get.max <- function (i.delta, ...) {
     i.delta[ord][[1]]
 }
 
-maxi <- function (Y, X, model, r, ...) {
+exchange <- function (Y, X, model, fit, r, purity, ...) {
     c <- unique(Y)
 
     if (length(setdiff(c,r)) == 0 ) {
-        return(load.it(model, Y[Y %in% r], model, r))
+        return(load.it(model, fit, Y[Y %in% r], 0, r))
     } else if (length(setdiff(c,r)) == 1) {
         a <- setdiff(c,r)
         c <- as.factor(setdiff(c,a))
     }
 
-    i.delta  <- lapply(c, function(x) load.swap(droplevels(x), Y, X, model, r))
-
+    i.delta  <- lapply(c, function(x) load.swap(droplevels(x), Y, X, model, r, purity))
     get.max(i.delta)
 }
 
-MSplit <- function (Y, X, model, Pure, ...) {
+MSplit <- function (Y, X, model, purity, ...) {
     c <- unlist(lapply(unique(Y), as.character))
-    r <- init.split(c)
 
-    i.candidate <- load.set(Y, X, model, r)
+    i.r         <- init.split(c)
+    i.candidate <- load.set(Y, X, model, i.r, purity)
     i.gain      <- i.candidate[["gain"]]
+    i.fit       <- i.candidate[["fit"]]
 
-    max.swap    <- maxi(Y, X, model, r)
+    max.swap    <- exchange(Y, X, model, i.fit, i.r, purity)
     iter.gain   <- max.swap$gain
 
     while(iter.gain - i.gain > 0) {
 
         i.candidate <- max.swap
         i.gain      <- i.candidate[["gain"]]
-        r           <- i.candidate[["r"]]
+        i.fit       <- i.candidate[["fit"]]
+        i.r         <- i.candidate[["r"]]
 
-        max.swap    <- maxi(Y, X, model, r)
+        max.swap    <- exchange(Y, X, model, i.fit, i.r, purity)
         iter.gain   <- max.swap$gain
     }
     i.candidate
 }
-
