@@ -1,6 +1,6 @@
 source("R/node.R")
 source("R/models.R")
-source("purity.R")
+source("R/purity.R")
 
 
 MulTree <- function (args = 0) {
@@ -101,7 +101,7 @@ get.parent <- function (t, id) {
 #' @examples
 #' Y  <- iris[,5]
 #' X  <- iris[,1:4]
-#' dt <- multree(X, Y, model = SVM)
+#' dt <- multree(Y, X)
 #' p  <- m.predict(dt, X)
 #' table(pred = p, actu = Y)
 
@@ -181,11 +181,11 @@ all.true.false <- function (Y, ...) {
 #'
 #' This function develops a multivariate decision tree classifier in 'x' to the class of 'y'.
 #'
-#' @param X a dataframe of continuous or categorical values.
-#' @param Y a vector of classes set as factors.
-#' @param Pure may be: gini, information, twoing. Sets impurity measure for a node.
-#' @param model may be: GLM, SVM, NET, LM, LDA. Sets the hyper surface spliter at nodes in the tree.
-#' @param a may be: any real value. Cuts-off the purity of the predicted class.
+#' @param \code{X} a dataframe of continuous or categorical values.
+#' @param \code{Y} a vector of classes set as factors.
+#' @param \code{purity} may be: \code{gini, information, twoing}. Sets impurity measure for a node.
+#' @param \code{model} may be: \code{glm, svm, net, lm, lda}. Sets the hyper surface spliter at nodes in the tree.
+#' @param \code{a} may be: any real value. Cuts-off tree growth if subset has purity greater than \code{a}.
 #'
 #' @return an MulTree object with a tree consisting of nodes and their attributes.
 #' @author David Rodriguez
@@ -196,9 +196,9 @@ all.true.false <- function (Y, ...) {
 #' @examples
 #' Y  <- iris[,5]
 #' X  <- iris[,1:4]
-#' dt <- multree(Y,X)
+#' dt <- multree(Y, X, "svm")
 
-multree <- function(Y, X, a = .75, model = "svm", tune = NULL, purity = "gini", is.forest = FALSE, ...) {
+multree <- function(Y, X, model = "svm", a = .8,  tune = NULL, purity = "gini", is.forest = FALSE, ...) {
     args <- mget(names(formals()),sys.frame(sys.nframe()))[-c(1,2)]
 
     purity <- Purity(purity)
@@ -222,7 +222,6 @@ multree <- function(Y, X, a = .75, model = "svm", tune = NULL, purity = "gini", 
         } else {
             m <- Model(model, tune)
             args[["model"]] <-  m
-            print(m)
             s      <- do.call(MSplit, c(XY, args))
             subset <- s[["candidates"]]
 
