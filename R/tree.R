@@ -1,4 +1,6 @@
 source("R/node.R")
+source("R/models.R")
+source("purity.R")
 
 
 MulTree <- function (args = 0) {
@@ -11,7 +13,6 @@ MulTree <- function (args = 0) {
 }
 
 get.top.percent <- function (Y, ...) {
-    print(Y)
     percent <- sort(table(Y), decreasing = TRUE) / length(Y)
     round(percent[[1]], 2)
 }
@@ -113,7 +114,7 @@ m.predict <- function(t, X, ...) {
       node <- get.branch(t, 1)
 
         while (node$r.id != 0 && node$l.id != 0) {
-            go.right <- predRCandidates(node$model,X[iter,], t$call$model)
+            go.right <- node$model$predictor(node$fit, X[iter,])
 
             if (go.right) {
                 node <- get.branch(t, node$r.id)
@@ -195,10 +196,13 @@ all.true.false <- function (Y, ...) {
 #' @examples
 #' Y  <- iris[,5]
 #' X  <- iris[,1:4]
-#' dt <- multree(X, Y, model = SVM)
+#' dt <- multree(Y,X)
 
-multree <- function(X, Y, Pure =Gini, is.forest = FALSE, splitter = MSplit, model = LM, a =.75, ...) {
+multree <- function(Y, X, a = .75, model = "svm", tune = NULL, purity = "gini", is.forest = FALSE, ...) {
     args <- mget(names(formals()),sys.frame(sys.nframe()))[-c(1,2)]
+
+    purity <- Purity(purity)
+    args[["purity"]] <- purity
 
     if (isTRUE(is.forest)) {
         B <- a.bag(X, Y)
@@ -216,7 +220,10 @@ multree <- function(X, Y, Pure =Gini, is.forest = FALSE, splitter = MSplit, mode
             n <- do.call(Node, XY)
             t <- grow.tree(t, n)
         } else {
-            s      <- do.call(splitter, c(XY, args))
+            m <- Model(model, tune)
+            args[["model"]] <-  m
+            print(m)
+            s      <- do.call(MSplit, c(XY, args))
             subset <- s[["candidates"]]
 
             if (is.null(subset) || all.true.false(subset)) {
@@ -224,7 +231,6 @@ multree <- function(X, Y, Pure =Gini, is.forest = FALSE, splitter = MSplit, mode
             } else {
                 children <- do.call(get.children, c(XY, list(subset = subset)))
                 q        <- push.children(q, id, children)
-
                 t        <- yes.children(t, XY, s, id)
                 id <- id + 2
             }
