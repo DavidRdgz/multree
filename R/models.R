@@ -2,16 +2,18 @@ require(nnet)
 require(MASS)
 require(e1071)
 
-Model <- function (type = "net", tune = NULL) {
+Model <- function (type = "net", tune = NULL, window = "all", n) {
 
     preset   <- presets(type)
-    pcall    <- pre.call(type, preset, tune)
-    ppredict <- pre.predict(type)
+    filter   <- pre.filter(window, n)
+    pcall    <- pre.call(type, preset, tune, filter)
+    ppredict <- pre.predict(type, filter)
 
     data <- list(
                  type      = type,
                  tuned     = tune,
                  presets   = preset,
+                 filter    = filter,
                  call      = pcall,
                  predictor = ppredict
                 )
@@ -20,7 +22,7 @@ Model <- function (type = "net", tune = NULL) {
 }
 
 presets <- function (model, ...) {
-    preset.list <- list("net" = list(size = 10, 
+    preset.list <- list("net" = list(size = 10,
                                      trace = FALSE),
                         "svm" = list(),
                         "lda" = list(),
@@ -29,7 +31,25 @@ presets <- function (model, ...) {
     preset.list[[model]]
 }
 
-pre.call <- function (type, presets, tune, ...) {
+pre.filter <- function(window, n, ...) {
+    do.call(toupper(window), list(n = n))
+}
+
+ALL <- function(n, ...) {
+  seq(n)
+}
+
+DOTS <- function(n, ...) {
+  sample(seq(n), floor(n/2), replace = FALSE )
+}
+
+BARS <- function(n, ...) {
+  l <- sample(seq(n),1)
+  s <- sample(seq(n-l),1)
+  seq(l) + s
+}
+
+pre.call <- function (type, presets, tune, filter, ...) {
     if (is.null(tune)) {
         params <- force(presets)
     } else {
@@ -37,15 +57,15 @@ pre.call <- function (type, presets, tune, ...) {
     }
 
     model <- function(Y, X, r, ...) {
-        do.call(toupper(type), list(Y = Y, X = X, r = r, params = params))
+        do.call(toupper(type), list(Y = Y, X = X[,filter, drop = FALSE], r = r, params = params))
     }
 }
 
-pre.predict <- function(type, ...) {
+pre.predict <- function(type, filter, ...) {
     name <- force(paste0(toupper(type),".predict"))
-    
+
     predictor <- function(n, X, ...) {
-        do.call(name, list(n = n, X = X))
+        do.call(name, list(n = n, X = X[,filter, drop = FALSE]))
     }
 }
 
@@ -77,7 +97,7 @@ NET <- function (Y, X, r, params, ...) {
 
     forms <- list(formula = as.formula("Y.hat ~ ."),
                   data = X)
-    
+
     do.call("nnet", c(forms, params))
 }
 
@@ -86,7 +106,7 @@ GLM <- function (Y, X, r, params, ...) {
 
     forms <- list(formula = as.formula("Y.hat ~ ."),
                   data = X)
-    
+
     do.call("glm", c(forms, params))
 }
 
@@ -96,7 +116,7 @@ SVM <- function (Y, X, r, params, ...) {
 
     forms <- list(formula = as.formula("Y.hat ~ ."),
                   data = X)
-    
+
     do.call("svm", c(forms, params))
 }
 
@@ -105,7 +125,7 @@ LDA <- function (Y, X, r, params, ...) {
 
     forms <- list(formula = as.formula("Y.hat ~ ."),
                   data = X)
-    
+
     do.call("lda", c(forms, params))
 }
 
@@ -114,23 +134,23 @@ LM <- function (Y, X, r, params, ...) {
 
     forms <- list(formula = as.formula("Y.hat ~ ."),
                   data = X)
-    
+
     do.call("lm", c(forms, params))
 }
 
 NET.predict <- function(n, X) {
     preds <- c(predict(n, X))
-    preds > 0
+    preds > .5
 }
 
 GLM.predict <- function(n, X) {
     preds <- c(predict(n, X))
-    preds > 0
+    preds > .5
 }
 
 LM.predict <- function(n, X) {
     preds <- c(predict(n, X))
-    preds > 0
+    preds > .5
 }
 
 SVM.predict <- function(n, X) {
