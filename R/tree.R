@@ -107,14 +107,15 @@ get.parent <- function (t, id) {
 
 m.predict <- function(t, X, ...) {
     predictions <- c()
-    cnt <- nrow(X)
-    pb <- txtProgressBar(min = 0, max = cnt, style = 3)
+    cnt         <- nrow(X)
+    pb          <- txtProgressBar(min = 0, max = cnt, style = 3)
+
     for (iter in seq_along(1:cnt)) {
       setTxtProgressBar(pb, iter)
       node <- get.branch(t, 1)
 
         while (node$r.id != 0 && node$l.id != 0) {
-            go.right <- node$model$predictor(node$fit, X[iter,])
+            go.right <- node$model$predictor(node$fit, X[iter,colnames(node$X)])
 
             if (go.right) {
                 node <- get.branch(t, node$r.id)
@@ -122,7 +123,7 @@ m.predict <- function(t, X, ...) {
                 node <- get.branch(t, node$l.id)
             }
         }
-        predictions <- c(predictions, node$label)
+        predictions  <- c(predictions, node$label)
     }
     predictions
 }
@@ -198,16 +199,11 @@ all.true.false <- function (Y, ...) {
 #' X  <- iris[,1:4]
 #' dt <- multree(Y, X, "svm")
 
-multree <- function(Y, X, model = "svm", a = .8,  tune = NULL, purity = "gini", is.forest = FALSE, ...) {
+multree <- function(Y, X, model = "svm", a = .8,  tune = NULL, purity = "gini", window = "all", ...) {
     args <- mget(names(formals()),sys.frame(sys.nframe()))[-c(1,2)]
 
     purity <- Purity(purity)
     args[["purity"]] <- purity
-
-    if (isTRUE(is.forest)) {
-        B <- a.bag(X, Y)
-        X <- B[["X"]]; Y <- B[["Y"]]
-    }
 
     id <- 1
     q  <- do.call(setup.queue, list(id, X, Y))
@@ -220,7 +216,7 @@ multree <- function(Y, X, model = "svm", a = .8,  tune = NULL, purity = "gini", 
             n <- do.call(Node, XY)
             t <- grow.tree(t, n)
         } else {
-            m <- Model(model, tune)
+            m <- Model(model, tune, window, ncol(XY[["X"]]))
             args[["model"]] <-  m
             s      <- do.call(MSplit, c(XY, args))
             subset <- s[["candidates"]]
@@ -237,5 +233,4 @@ multree <- function(Y, X, model = "svm", a = .8,  tune = NULL, purity = "gini", 
     }
     t
 }
-
 
