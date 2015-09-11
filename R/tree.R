@@ -187,6 +187,8 @@ all.true.false <- function (Y, ...) {
 #' @param \code{purity} may be: \code{gini, information, twoing}. Sets impurity measure for a node.
 #' @param \code{model} may be: \code{glm, svm, net, lm, lda}. Sets the hyper surface spliter at nodes in the tree.
 #' @param \code{a} may be: any real value. Cuts-off tree growth if subset has purity greater than \code{a}.
+#' @param \code{window} maybe be: \code{all,dots,bars}. This provides at each split, either selecting all the columns (all) or randomly selecting #(cols/2) (dots), or selecting a random sequence of columns (bars).
+#'
 #'
 #' @return an MulTree object with a tree consisting of nodes and their attributes.
 #' @author David Rodriguez
