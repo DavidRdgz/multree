@@ -1,4 +1,6 @@
 export("multree")
 export("m.predict")
 export("force.graph")
+export("mulforest")
+export("mf.predict")
 
