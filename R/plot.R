@@ -20,7 +20,6 @@ get.labels <- function (dt, ...) {
         labs <- c(labs, sort(paste(node$r, collapse="-")))
     }
     candidates <- unique(labs)
-    #data.frame(names, group = lookup(labs, candidates), size = rep(1,length(names)))
     data.frame(names, group = labs, size = rep(1,length(names)))
 }
 
