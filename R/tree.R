@@ -115,7 +115,7 @@ m.predict <- function(t, X, ...) {
       node <- get.branch(t, 1)
 
         while (node$r.id != 0 && node$l.id != 0) {
-            go.right <- node$model$predictor(node$fit, X[iter,colnames(node$X)])
+            go.right <- node$model$predictor(node$fit, X[iter,])
 
             if (go.right) {
                 node <- get.branch(t, node$r.id)
