@@ -5,7 +5,7 @@
 \title{Building a multivariate decision tree}
 \usage{
 multree(Y, X, model = "svm", a = 0.8, tune = NULL, purity = "gini",
-  window = "all", ...)
+  window = "all", features = "i", ...)
 }
 \arguments{
 \item{\code{X}}{a dataframe of continuous or categorical values.}
@@ -19,6 +19,8 @@ multree(Y, X, model = "svm", a = 0.8, tune = NULL, purity = "gini",
 \item{\code{a}}{may be: any real value. Cuts-off tree growth if subset has purity greater than \code{a}.}
 
 \item{\code{window}}{maybe be: \code{all,dots,bars}. This provides at each split, either selecting all the columns (all) or randomly selecting #(cols/2) (dots), or selecting a random sequence of columns (bars).}
+
+\item{\code{features}}{may be: \code{i, s, m, a}. These represent: i = identity, s = sum, m = mean, a = aboslute mean aggregates over filter columns.}
 }
 \value{
 an MulTree object with a tree consisting of nodes and their attributes.
