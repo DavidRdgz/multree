@@ -115,7 +115,7 @@ m.predict <- function(t, X, ...) {
       node <- get.branch(t, 1)
 
         while (node$r.id != 0 && node$l.id != 0) {
-            go.right <- node$model$predictor(node$fit, X[iter,])
+            go.right <- node$model$predictor(node$fit, X[iter, , drop = FALSE])
 
             if (go.right) {
                 node <- get.branch(t, node$r.id)
@@ -188,6 +188,7 @@ all.true.false <- function (Y, ...) {
 #' @param \code{model} may be: \code{glm, svm, net, lm, lda}. Sets the hyper surface spliter at nodes in the tree.
 #' @param \code{a} may be: any real value. Cuts-off tree growth if subset has purity greater than \code{a}.
 #' @param \code{window} maybe be: \code{all,dots,bars}. This provides at each split, either selecting all the columns (all) or randomly selecting #(cols/2) (dots), or selecting a random sequence of columns (bars).
+#' @param \code{features} may be: \code{i, s, m, a}. These represent: i = identity, s = sum, m = mean, a = aboslute mean aggregates over filter columns.
 #'
 #'
 #' @return an MulTree object with a tree consisting of nodes and their attributes.
@@ -201,7 +202,7 @@ all.true.false <- function (Y, ...) {
 #' X  <- iris[,1:4]
 #' dt <- multree(Y, X, "svm")
 
-multree <- function(Y, X, model = "svm", a = .8,  tune = NULL, purity = "gini", window = "all", ...) {
+multree <- function(Y, X, model = "svm", a = .8,  tune = NULL, purity = "gini", window = "all", features = "i", ...) {
     args <- mget(names(formals()),sys.frame(sys.nframe()))[-c(1,2)]
 
     purity <- Purity(purity)
@@ -218,7 +219,7 @@ multree <- function(Y, X, model = "svm", a = .8,  tune = NULL, purity = "gini", 
             n <- do.call(Node, XY)
             t <- grow.tree(t, n)
         } else {
-            m <- Model(model, tune, window, ncol(XY[["X"]]))
+            m <- Model(model, tune, window, features, ncol(XY[["X"]]))
             args[["model"]] <-  m
             s      <- do.call(MSplit, c(XY, args))
             subset <- s[["candidates"]]
@@ -235,4 +236,3 @@ multree <- function(Y, X, model = "svm", a = .8,  tune = NULL, purity = "gini", 
     }
     t
 }
-
