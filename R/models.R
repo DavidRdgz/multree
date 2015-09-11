@@ -2,18 +2,20 @@ require(nnet)
 require(MASS)
 require(e1071)
 
-Model <- function (type = "net", tune = NULL, window = "all", n) {
+Model <- function (type = "net", tune = NULL, window = "all", features = "i", n) {
 
-    preset   <- presets(type)
-    filter   <- pre.filter(window, n)
-    pcall    <- pre.call(type, preset, tune, filter)
-    ppredict <- pre.predict(type, filter)
+    preset    <- presets(type)
+    filter    <- pre.filter(window, n)
+    extractors<- pre.extractors(features)
+    pcall     <- pre.call(type, preset, tune, filter, features)
+    ppredict  <- pre.predict(type, filter, features)
 
     data <- list(
                  type      = type,
                  tuned     = tune,
                  presets   = preset,
                  filter    = filter,
+                 extrators = extractors,
                  call      = pcall,
                  predictor = ppredict
                 )
@@ -35,37 +37,68 @@ pre.filter <- function(window, n, ...) {
     do.call(toupper(window), list(n = n))
 }
 
+pre.extractors <- function(features, ...) {
+    f.list <- list("i" = I,
+                   "s" = sum,
+                   "m" = mean,
+                   "a" = function(x) mean(abs(x)))
+    decode <- unlist(strsplit(features, "*[w]*"))
+    f.list[names(f.list) %in% decode]
+}
+
 ALL <- function(n, ...) {
-  seq(n)
+  list(seq(n))
 }
 
 DOTS <- function(n, ...) {
-  sample(seq(n), floor(n/2), replace = FALSE )
+  list(sample(seq(n), floor(n/2), replace = FALSE ))
 }
 
 BARS <- function(n, ...) {
   l <- sample(seq(n),1)
-  s <- sample(seq(n-l),1)
-  seq(l) + s
+  if (l == n) {
+    return(list(seq(l)))
+  } else {
+    s <- sample(c(0,seq(n-l)),1)
+    return(list(seq(l) + s))
+  }
 }
 
-pre.call <- function (type, presets, tune, filter, ...) {
+random.box <- function(X, filter, extractors) {
+    f <- lapply(filter, function(x) X[, x, drop = FALSE])
+    f <- lapply(extractors, function(x) do.call(cbind, Map(function(y) apply(y, 1, x), f)))
+    do.call(cbind, f)
+}
+
+pre.call <- function (type, presets, tune, filter, features,  ...) {
     if (is.null(tune)) {
         params <- force(presets)
     } else {
         params <- force(tune)
     }
 
-    model <- function(Y, X, r, ...) {
-        do.call(toupper(type), list(Y = Y, X = X[,filter, drop = FALSE], r = r, params = params))
+    if (features == "i") {
+      model <- function(Y, X, r, ...) {
+          do.call(toupper(type), list(Y = Y, X = X[,unlist(filter), drop = FALSE], r = r, params = params))
+      }
+    } else {
+      model <- function(Y, X, r, ...) {
+          do.call(toupper(type), list(Y = Y, X = random.box(X, filter, features), r = r, params = params))
+      }
     }
 }
 
-pre.predict <- function(type, filter, ...) {
+pre.predict <- function(type, filter, features, ...) {
     name <- force(paste0(toupper(type),".predict"))
 
-    predictor <- function(n, X, ...) {
-        do.call(name, list(n = n, X = X[,filter, drop = FALSE]))
+    if (features == "i") {
+      predictor <- function(n, X, ...) {
+          do.call(name, list(n = n, X = X[,unlist(filter), drop = FALSE]))
+      }
+    } else {
+      predictor <- function(n, X, ...) {
+          do.call(name, list(n = n, X = random.box(X, filter, features)))
+      }
     }
 }
 
