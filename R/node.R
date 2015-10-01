@@ -1,7 +1,7 @@
 source("R/purity.R")
 source("R/models.R")
 
-Node <- function (id, X, Y, label, model = 0, fit = 0, r = 0, percent= 0,  cutoff= 0, l.id = 0, r.id = 0, candidates = 0, gain = 0) {
+Node <- function (id, X, Y, label, model = 0, fit = 0, r = 0, percent= 0,  cutoff= .5, l.id = 0, r.id = 0, candidates = 0, gain = 0) {
     data <- list(
                  id         = id,
                  X          = X,
@@ -16,7 +16,7 @@ Node <- function (id, X, Y, label, model = 0, fit = 0, r = 0, percent= 0,  cutof
                  fit        = fit,
                  percent    = percent,
                  cutoff     = cutoff
-                )
+                 )
     class(data) <- append(class(data), "Node")
     return(data)
 }
@@ -86,7 +86,6 @@ MSplit <- function (Y, X, model, purity, ...) {
 
     max.swap    <- exchange(Y, X, model, i.fit, i.r, purity)
     iter.gain   <- max.swap$gain
-
     while(iter.gain - i.gain > 0) {
 
         i.candidate <- max.swap
