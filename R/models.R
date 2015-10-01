@@ -119,7 +119,8 @@ rNET <- function(cplx) {
     if (f.n == x.n) {
         size <- sample(seq(round(f.n * (.5 + o.c.prop),0), round(f.n*(.5 + 1.25),0)),1)
     } else {
-        size <- sample(seq(f.n, round(x.n*1.5,0)),1, prob = quick.p(x.n, f.n, t.prop))
+        size <- f.n
+        #size <- sample(seq(f.n, round(x.n*1.5,0)),1, prob = quick.p(x.n, f.n, t.prop))
     }
     data <- list(size = size
                  )
