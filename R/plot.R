@@ -2,10 +2,10 @@ source("R/tree.R")
 require(networkD3)
 
 lookup <- function(labels, unique.labels) {
-  for (iter in 1:length(unique.labels)) {
-      labels[labels == unique.labels[iter]] <- iter
-      }
-  as.numeric(labels)
+    for (iter in 1:length(unique.labels)) {
+        labels[labels == unique.labels[iter]] <- iter
+    }
+    as.numeric(labels)
 }
 
 get.children.id <- function (node, ...) {
@@ -63,8 +63,8 @@ simple.graph <- function (dt, ...) {
 
 force.graph <- function (dt, ...) {
     networkD3::forceNetwork(Links = graph.value(dt), Nodes = get.labels(dt),
-                Source = "Source", Target = "Target", Value = "value",
-                NodeID = "names", Group = "group", opacity = .9,
-                legend = TRUE, zoom = TRUE, fontSize = 10,
-                opacityNoHover = 1)
+                            Source = "Source", Target = "Target", Value = "value",
+                            NodeID = "names", Group = "group", opacity = .9,
+                            legend = TRUE, zoom = TRUE, fontSize = 10,
+                            opacityNoHover = 1)
 }
