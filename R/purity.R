@@ -1,4 +1,3 @@
-
 Purity <- function (type = "info") {
 
     pcall <- pre2.call(type)
@@ -8,7 +7,7 @@ Purity <- function (type = "info") {
                  call       = pcall,
                  gain       = NULL,
                  gain.ratio = NULL
-                )
+                 )
     class(data) <- append(class(data), "Purity")
     return(data)
 }
@@ -52,7 +51,7 @@ GINI <- function (Ys, ...) {
 }
 
 TWOING <- function (Ys, ...) {
-     table(Ys)/length(Ys)
+    table(Ys)/length(Ys)
 }
 
 potential <- function (p, ...) {
@@ -60,7 +59,7 @@ potential <- function (p, ...) {
 }
 
 get.gain <- function (I, IL, IR, p, ...) {
-   I - p * IR - (1-p) * IL
+    I - p * IR - (1-p) * IL
 }
 
 abs.sum <- function (IL, IR, p, ...) {
