@@ -103,7 +103,7 @@ lookup.presets <- function (model, cplx, ...) {
     preset.list[[model]]
 }
 
-quick.p <- function (x.n, f.n) {
+quick.p <- function (x.n, f.n, t.prop) {
     k <- round(x.n*1.5,0) - f.n
     p <- (k+1):1/(k+1)
     p <- p/sum(p)
@@ -119,7 +119,7 @@ rNET <- function(cplx) {
     if (f.n == x.n) {
         size <- sample(seq(round(f.n * (.5 + o.c.prop),0), round(f.n*(.5 + 1.25),0)),1)
     } else {
-        size <- sample(seq(f.n, round(x.n*1.5,0)),1, prob = quick.p(p))
+        size <- sample(seq(f.n, round(x.n*1.5,0)),1, prob = quick.p(x.n, f.n, t.prop))
     }
     data <- list(size = size
                  )
@@ -171,7 +171,8 @@ BARS <- function(x.n, low = 1, high = x.n, ...) {
     list(bar + p)
 }
 
-KBARS <- function(w, k, low = 1, high = x.n, ...) {
+KBARS <- function(w, k, low = 1, high = w, ...) {
+    print(c(w, k, low, high))
     lapply(c(0,seq(k-1)), function(x) c(x*w + unlist(BARS(w, low, high))))
 }
 
