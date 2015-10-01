@@ -4,23 +4,31 @@
 \alias{multree}
 \title{Building a multivariate decision tree}
 \usage{
-multree(Y, X, model = "svm", a = 0.8, tune = NULL, purity = "gini",
-  window = "all", features = "i", ...)
+multree(Y, X, split = "svm", a = 0.8, tune = NULL, purity = "gini",
+  feature.space = list(window = "all", w = 0, k = 0, features = "i"), ...)
 }
 \arguments{
-\item{\code{X}}{a dataframe of continuous or categorical values.}
+\item{Y}{a vector of classes set as factors.}
 
-\item{\code{Y}}{a vector of classes set as factors.}
+\item{X}{a dataframe of continuous or categorical values.}
 
-\item{\code{purity}}{may be: \code{gini, information, twoing}. Sets impurity measure for a node.}
+\item{split}{may be: \code{glm, svm, net, lm, lda}. Sets the hyper surface spliter at nodes in the tree.}
 
-\item{\code{model}}{may be: \code{glm, svm, net, lm, lda}. Sets the hyper surface spliter at nodes in the tree.}
+\item{a}{may be: any real value. Cuts-off tree growth if subset has purity greater than \code{a}.}
 
-\item{\code{a}}{may be: any real value. Cuts-off tree growth if subset has purity greater than \code{a}.}
+\item{tune}{may be a list of arguments used instead of presets for \code{glm, svm, net, lm, lda}.}
 
-\item{\code{window}}{maybe be: \code{all,dots,bars}. This provides at each split, either selecting all the columns (all) or randomly selecting #(cols/2) (dots), or selecting a random sequence of columns (bars).}
+\item{purity}{may be: \code{gini, information, twoing}. Sets impurity measure for a node.}
 
-\item{\code{features}}{may be: \code{i, s, m, a}. These represent: i = identity, s = sum, m = mean, a = aboslute mean aggregates over filter columns.}
+\item{feature.space}{List identifying the columns of the matrix, and features to extract using \code{window, w, k, features} variables.}
+
+\item{window}{maybe be: \code{all,dots,bars,kbars}. This provides at each split, either selecting all the columns (all) or randomly selecting #(cols/2) (dots), or selecting a random sequence of columns (bars).}
+
+\item{w}{may be: used with \code{kbars} specifies window size.}
+
+\item{k}{may be: used with \code{kbars} specifies the slide (number of \code{w} windows).}
+
+\item{features}{may be: \code{i, s, m, a}. These represent: i = identity, s = sum, m = mean, a = aboslute mean aggregates over filter columns.}
 }
 \value{
 an MulTree object with a tree consisting of nodes and their attributes.
