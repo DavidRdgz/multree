@@ -222,13 +222,17 @@ init.args <- function(args, Y, X, ...) {
 #'
 #' This function develops a multivariate decision tree classifier in 'x' to the class of 'y'.
 #'
-#' @param \code{X} a dataframe of continuous or categorical values.
-#' @param \code{Y} a vector of classes set as factors.
-#' @param \code{purity} may be: \code{gini, information, twoing}. Sets impurity measure for a node.
-#' @param \code{model} may be: \code{glm, svm, net, lm, lda}. Sets the hyper surface spliter at nodes in the tree.
-#' @param \code{a} may be: any real value. Cuts-off tree growth if subset has purity greater than \code{a}.
-#' @param \code{window} maybe be: \code{all,dots,bars}. This provides at each split, either selecting all the columns (all) or randomly selecting #(cols/2) (dots), or selecting a random sequence of columns (bars).
-#' @param \code{features} may be: \code{i, s, m, a}. These represent: i = identity, s = sum, m = mean, a = aboslute mean aggregates over filter columns.
+#' @param X a dataframe of continuous or categorical values.
+#' @param Y a vector of classes set as factors.
+#' @param purity may be: \code{gini, information, twoing}. Sets impurity measure for a node.
+#' @param split may be: \code{glm, svm, net, lm, lda}. Sets the hyper surface spliter at nodes in the tree.
+#' @param a may be: any real value. Cuts-off tree growth if subset has purity greater than \code{a}.
+#' @param tune may be a list of arguments used instead of presets for \code{glm, svm, net, lm, lda}.
+#' @param feature.space List identifying the columns of the matrix, and features to extract using \code{window, w, k, features} variables.
+#' @param window maybe be: \code{all,dots,bars,kbars}. This provides at each split, either selecting all the columns (all) or randomly selecting #(cols/2) (dots), or selecting a random sequence of columns (bars).
+#' @param w may be: used with \code{kbars} specifies window size.
+#' @param k may be: used with \code{kbars} specifies the slide (number of \code{w} windows).
+#' @param features may be: \code{i, s, m, a}. These represent: i = identity, s = sum, m = mean, a = aboslute mean aggregates over filter columns.
 #'
 #'
 #' @return an MulTree object with a tree consisting of nodes and their attributes.
