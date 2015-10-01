@@ -84,7 +84,7 @@ lookup.presets <- function (model, cplx, ...) {
                                      decay    = 5e-4),
                                      #Wts      = pre.wts(Y.hat, X, n,length(r))),
                         "rnet" = list(size    = rNET(cplx)$size,
-                                      MaxNWts = 5000,
+                                      MaxNWts = 15000,
                                       trace   = FALSE,
                                       decay   = 5e-4),
                                       #Wts     = pre.wts(Y.hat, X, n,length(r))),
@@ -210,6 +210,7 @@ pre.call <- function (model, tune, presets, filter, extractors,  ...) {
     } else {
         mod <- function(Y, X, r, ...) {
             mm.dat <- random.box(X, filter, extractors)
+            print(ncol(mm.dat))
             do.call(toupper(model), list(Y = Y, X = mm.dat, r = r, params = params))
         }
     }
