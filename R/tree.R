@@ -7,7 +7,7 @@ MulTree <- function (args = 0) {
     data <- list(
                  tree = list(),
                  call = args
-                )
+                 )
     class(data) <- append(class(data), "MulTree")
     return(data)
 }
@@ -22,11 +22,11 @@ get.top <- function (Y, ...) {
 }
 
 get.X <- function (XY, subset, ...) {
-   droplevels(XY[[2]][subset,])
+    droplevels(XY[[2]][subset,])
 }
 
 get.Y <- function (XY, subset, ...) {
-   droplevels(XY[[3]][subset])
+    droplevels(XY[[3]][subset])
 }
 
 setup.queue <- function (id, X, Y, ...) {
@@ -39,8 +39,8 @@ push.queue <- function (q, id, X, Y, ...) {
 }
 
 children.payload <- function (XY, s, id,  ...) {
-     children <- list(r.id = id + 1 , l.id = id + 2)
-     c(XY, s, children)
+    children <- list(r.id = id + 1 , l.id = id + 2)
+    c(XY, s, children)
 }
 
 nochildren.payload <- function (XY, s, ...) {
@@ -70,6 +70,16 @@ get.leaves <- function (t, ...) {
         }
     }
     leaves
+}
+
+get.internal <- function (t, ...) {
+    internal <- list()
+    for (node in t$tree) {
+        if (node$l.id != 0 && node$r.id != 0) {
+            internal[[length(internal) + 1 ]] <- node
+        }
+    }
+    internal
 }
 
 is.a.leaf <- function (n, ...) {
@@ -111,8 +121,8 @@ m.predict <- function(t, X, ...) {
     pb          <- txtProgressBar(min = 0, max = cnt, style = 3)
 
     for (iter in seq_along(1:cnt)) {
-      setTxtProgressBar(pb, iter)
-      node <- get.branch(t, 1)
+        setTxtProgressBar(pb, iter)
+        node <- get.branch(t, 1)
 
         while (node$r.id != 0 && node$l.id != 0) {
             go.right <- node$model$predictor(node$fit, X[iter, , drop = FALSE])
@@ -150,7 +160,7 @@ push.children <- function (q, n.id, children, ...) {
 
 is.pure <- function (Y, a, ...) {
     if ( length(Y) < 2) {
-      return(TRUE)
+        return(TRUE)
     }
     n <- table(Y)/length(Y) > a
     sum(n) > 0
@@ -172,11 +182,41 @@ yes.children <- function (t, XY, s, id, ...) {
 all.true.false <- function (Y, ...) {
     n <- sum(Y)/length(Y)
     if (n == 0 || n  ==1) {
-       return(TRUE)
+        return(TRUE)
     } else {
-       return(FALSE)
+        return(FALSE)
     }
 }
+
+rangle <- function(vec) {
+    if (length(vec) == 1) {
+        return(function(x) vec)
+    } else {
+        return(function(x) sample(vec, 1))
+    }
+}
+
+a.tune <- function(tune) {
+    if (!is.null(tune)) {
+        if ("size" %in% names(tune)) {
+            tune[["size"]] = rangle(tune[["size"]])
+        }
+        if ("degree" %in% names(tune)) {
+            tune[["degree"]] = rangle(tune[["degree"]])
+        }
+    }
+    tune
+}
+
+init.args <- function(args, Y, X, ...) {
+
+    args[["dist.y"]] <- table(Y)
+    args[["m.x"]]    <- nrow(X)
+    args[["tune"]]   <- a.tune(args[["tune"]])
+    args[["purity"]] <- Purity(args[["purity"]])
+    args
+}
+
 
 #' Building a multivariate decision tree
 #'
@@ -202,11 +242,10 @@ all.true.false <- function (Y, ...) {
 #' X  <- iris[,1:4]
 #' dt <- multree(Y, X, "svm")
 
-multree <- function(Y, X, model = "svm", a = .8,  tune = NULL, purity = "gini", window = "all", features = "i", ...) {
+multree <- function(Y, X, split = "svm", a = .8,  tune = NULL, purity = "gini", feature.space = list(window = "all", w = 0, k = 0, features = "i"), ...) {
     args <- mget(names(formals()),sys.frame(sys.nframe()))[-c(1,2)]
 
-    purity <- Purity(purity)
-    args[["purity"]] <- purity
+    args <- init.args(args, Y, X)
 
     id <- 1
     q  <- do.call(setup.queue, list(id, X, Y))
@@ -219,10 +258,9 @@ multree <- function(Y, X, model = "svm", a = .8,  tune = NULL, purity = "gini", 
             n <- do.call(Node, XY)
             t <- grow.tree(t, n)
         } else {
-            m <- Model(model, tune, window, features, ncol(XY[["X"]]))
-            args[["model"]] <-  m
-            s      <- do.call(MSplit, c(XY, args))
-            subset <- s[["candidates"]]
+            args[["model"]] <- do.call(Model, c(args, XY))
+            s               <- do.call(MSplit, c(XY, args))
+            subset          <- s[["candidates"]]
 
             if (is.null(subset) || all.true.false(subset)) {
                 t        <- no.children(t, XY, s)
