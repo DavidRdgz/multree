@@ -1,18 +1,18 @@
 source("R/tree.R")
 
 MulForest <- function (args = 0) {
-  data <- list(
-    forest = list(),
-    call   = args
-  )
-  class(data) <- append(class(data), "MulForest")
-  return(data)
+    data <- list(
+                 forest = list(),
+                 call   = args
+                 )
+    class(data) <- append(class(data), "MulForest")
+    return(data)
 }
 
 m.top <- function(m, ...) {
-  stats <- lapply(apply(m,1, list), table)
-  top   <- lapply(stats, function(x) names(sort(x, decreasing = TRUE))[1])
-  do.call(c, top)
+    stats <- lapply(apply(m,1, list), table)
+    top   <- lapply(stats, function(x) names(sort(x, decreasing = TRUE))[1])
+    unlist(top)
 }
 
 
@@ -38,15 +38,15 @@ m.top <- function(m, ...) {
 #' table(pred = p, actu = Y)
 
 mf.predict <- function(f, X) {
-  p   <- lapply(f$forest, function(x) m.predict(x, X))
-  d   <- do.call(cbind, p)
-  m.top(d)
+    p   <- lapply(f$forest, function(x) m.predict(x, X))
+    d   <- do.call(cbind, p)
+    m.top(d)
 }
 
 add.tree <- function (f, t, ...) UseMethod("add.tree")
 add.tree.MulForest <- function (f, t, ...) {
-  f$forest[[length(f$forest)+1]] <- t
-  f
+    f$forest[[length(f$forest)+1]] <- t
+    f
 }
 
 #' Building a multivariate decision forest
@@ -74,14 +74,23 @@ add.tree.MulForest <- function (f, t, ...) {
 #' dt <- mulforest(Y, X, "net")
 
 
-mulforest <- function(Y, X, model = "svm", a = .8,  tune = NULL, purity = "gini", window = "dots", features = "i", size = 10, ...) {
-  args <- mget(names(formals()),sys.frame(sys.nframe()))[-c(1,2)]
-  f <- MulForest(args)
+mulforest <- function(Y, X, model = "svm", a = .8,  tune = NULL, purity = "info", feature.space = list(window = "dots", w = 0, k = 0, features = "i"), size = 10, ...) {
+    args <- mget(names(formals()),sys.frame(sys.nframe()))[-c(1,2)]
 
-  #randomize net size, svm degree, glm to glmnet or lasso
-  for (i in seq(size)) {
-    t <- multree(Y, X, model, a,  tune, purity, window, features)
-    f <- add.tree(f, t)
-  }
-  f
+    f    <- MulForest(args)
+    pb   <- txtProgressBar(min = 0, max = size, style = 3)
+
+    #randomize net size, svm degree, glm to glmnet or lasso
+    for (i in seq(size)) {
+        setTxtProgressBar(pb, i)
+        ss <- sample(seq(nrow(X)), round(4/5*nrow(X),0), replace = FALSE)
+        X.x <- droplevels(X[ss,])
+        Y.y <- droplevels(Y[ss])
+        t <- multree(Y.y,X.x, model, a,  tune, purity, feature.space)
+        f <- add.tree(f, t)
+    }
+    f
 }
+
+
+
